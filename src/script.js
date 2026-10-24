@@ -112,7 +112,7 @@ isSplitBillCheck.addEventListener('change', function() {
     }
 });
 
-// Modal Detail Logic
+// Modal Detail Logic (Diperbarui dengan ui-pustaka.js)
 function openModal(id) {
     const exp = expenses.find(e => e.id === id);
     if(!exp) return;
@@ -120,7 +120,7 @@ function openModal(id) {
     const noteHtml = exp.note ? `<div class="modal-detail-row"><span class="modal-detail-label">Keterangan</span><span class="modal-detail-value" style="font-weight:500; font-size:0.85rem; max-width:60%; text-align:right;">${exp.note}</span></div>` : '';
     const imgHtml = exp.receipt ? `<img src="${exp.receipt}" class="modal-img-preview" alt="Struk">` : '';
     
-    modalBody.innerHTML = `
+    bukaModalDetailHTML(`
         <div class="modal-detail-row"><span class="modal-detail-label">Transaksi</span><span class="modal-detail-value">${exp.name}</span></div>
         <div class="modal-detail-row"><span class="modal-detail-label">Nominal</span><span class="modal-detail-value text-danger">${formatRupiah(exp.amount)}</span></div>
         <div class="modal-detail-row"><span class="modal-detail-label">Waktu</span><span class="modal-detail-value">${exp.timestamp}</span></div>
@@ -128,11 +128,8 @@ function openModal(id) {
         <div class="modal-detail-row"><span class="modal-detail-label">Sifat</span><span class="modal-detail-value">${exp.type}</span></div>
         ${noteHtml}
         ${imgHtml}
-    `;
-    detailModal.classList.remove('hidden');
+    `);
 }
-closeModalBtn.addEventListener('click', () => detailModal.classList.add('hidden'));
-detailModal.addEventListener('click', (e) => { if(e.target === detailModal) detailModal.classList.add('hidden'); });
 
 // Modal Confirm Delete Logic
 function askDeleteConfirmation(id) {
@@ -152,9 +149,8 @@ confirmDeleteBtn.addEventListener('click', () => {
         updateDashboard();
         renderChart();
         
-        toastMessage.textContent = 'Transaksi telah dihapus.';
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
+        // Memanggil API Toast Bootstrap
+        tampilkanToast('Transaksi telah dihapus.');
     }
     idToDelete = null;
     confirmModal.classList.add('hidden');
@@ -299,7 +295,8 @@ function processNewExpense() {
                 expenses[index].note = note; 
                 if (receiptUrl) expenses[index].receipt = receiptUrl;
             }
-            toastMessage.textContent = 'Transaksi diperbarui!';
+            // Memanggil API Toast Bootstrap
+            tampilkanToast('Transaksi diperbarui!');
             resetEditMode();
         } else {
             const newExpense = {
@@ -313,7 +310,8 @@ function processNewExpense() {
                 timestamp: getCurrentTimestamp()
             };
             expenses.unshift(newExpense);
-            toastMessage.textContent = 'Transaksi dicatat.';
+            // Memanggil API Toast Bootstrap
+            tampilkanToast('Transaksi dicatat.');
             expenseForm.reset();
             noteInput.value = '';
         }
@@ -333,8 +331,6 @@ function processNewExpense() {
         }
 
         updateDashboard();
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
     }, 800);
 }
 
