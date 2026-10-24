@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dompet Anak Kos - Final Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="parallax-bg">
+        <div class="blob blob-1" id="blob1"></div>
+        <div class="blob blob-2" id="blob2"></div>
+    </div>
+
+    <!-- Fixed Navbar -->
+    <nav class="glass-navbar">
+        <button class="nav-btn active" data-target="homeView"><i class="fa-solid fa-house"></i> Beranda</button>
+        <button class="nav-btn" data-target="reportView"><i class="fa-solid fa-chart-simple"></i> Laporan</button>
+        <button class="nav-btn" data-target="profileView"><i class="fa-solid fa-user"></i> Profil</button>
+    </nav>
+
+    <!-- TAMPILAN BERANDA -->
+    <main class="main-wrapper view-section active" id="homeView">
+        <header class="app-header glass-panel text-center">
+            <div class="icon-header" style="color: var(--primary);"><i class="fa-solid fa-wallet"></i></div>
+            <h1>Dompet Anak Kos</h1>
+            <p>Kendali finansial praktis, serba cepat.</p>
+        </header>
+
+        <!-- Ringkasan Saldo -->
+        <section class="summary-card glass-panel" id="summaryCard">
+            <div class="budget-setup">
+                <label for="monthlyBudget">Dana/Anggaran Anda Bulan Ini</label>
+                <div class="input-wrapper edit-mode">
+                    <span class="prefix">Rp</span>
+                    <!-- PERBAIKAN KAYSAN: Value dikosongkan agar pengguna input manual -->
+                    <input type="text" inputmode="numeric" id="monthlyBudget" value="" placeholder="Ketik dana awal...">
+                    <span class="edit-icon"><i class="fa-solid fa-pen"></i></span>
+                </div>
+            </div>
+            
+            <div class="balance-display">
+                <p class="balance-label">SISA SALDO AKTIF</p>
+                <h2 id="remainingBalance" class="responsive-amount">Rp 0</h2>
+                
+                <div class="daily-allowance-box" id="frugalBox">
+                    <span class="allowance-label">Batas Aman Harian (Sisa <span id="daysLeft">30</span> Hari):</span>
+                    <strong id="dailyAllowance" class="text-safe">Rp 0 / hari</strong>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div id="balanceProgress" class="progress-bar safe" style="width: 100%;"></div>
+                </div>
+                <p id="balanceStatus" class="status-text">Aman terkendali! <i class="fa-solid fa-rocket"></i></p>
+            </div>
+        </section>
+
+        <!-- Form Pencatatan Cepat -->
+        <section class="form-section glass-panel">
+            <h3 id="formTitle">Catat Transaksi Baru</h3>
+            <form id="expenseForm" novalidate>
+                <input type="hidden" id="editingId" value="">
+                
+                <div class="form-group">
+                    <label for="expenseName">Nama Pengeluaran</label>
+                    <input type="text" id="expenseName" class="glass-input" placeholder="Contoh: Nasi Goreng, Bensin..." autocomplete="off">
+                    <span class="error-msg" id="error-expenseName"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expenseAmount">Nominal (Rp)</label>
+                        <div class="input-wrapper glass-input">
+                            <span class="prefix">Rp</span>
+                            <input type="text" inputmode="numeric" id="expenseAmount" placeholder="25.000">
+                        </div>
+                        <span class="error-msg" id="error-expenseAmount"></span>
+                    </div>
+
+                    <!-- Kategori Cepat -->
+                    <div class="form-group">
+                        <label>Kategori Pos</label>
+                        <div class="pill-group">
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Makan" checked>
+                                <span><i class="fa-solid fa-burger"></i> Makan</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Minuman">
+                                <span><i class="fa-solid fa-mug-hot"></i> Minuman</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Kos">
+                                <span><i class="fa-solid fa-house"></i> Kos</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Transportasi">
+                                <span><i class="fa-solid fa-motorcycle"></i> Transport</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Kuliah">
+                                <span><i class="fa-solid fa-book"></i> Kuliah</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Belanja">
+                                <span><i class="fa-solid fa-cart-shopping"></i> Belanja</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Tagihan">
+                                <span><i class="fa-solid fa-file-invoice-dollar"></i> Tagihan</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Hiburan">
+                                <span><i class="fa-solid fa-gamepad"></i> Hiburan</span>
+                            </label>
+                            <label class="pill-btn">
+                                <input type="radio" name="expenseCategory" value="Kesehatan">
+                                <span><i class="fa-solid fa-pills"></i> Kesehatan</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row align-center">
+                    <!-- Sifat Pengeluaran -->
+                    <div class="form-group">
+                        <label>Sifat Pengeluaran</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="expenseType" value="Kebutuhan" checked> 
+                                <span class="custom-radio"></span> Kebutuhan
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="expenseType" value="Keinginan"> 
+                                <span class="custom-radio"></span> Keinginan
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Struk -->
+                    <div class="form-group file-group">
+                        <label>Dokumentasi / Bukti (Opsional)</label>
+                        <div class="custom-file-upload">
+                            <input type="file" id="expenseReceipt" accept="image/*">
+                            <label for="expenseReceipt" id="fileLabel">
+                                <span class="upload-icon"><i class="fa-solid fa-camera"></i></span> 
+                                <!-- PERBAIKAN ABIL: Penamaan foto diperjelas -->
+                                <span id="fileName">Pilih Foto / Screenshot...</span>
+                            </label>
+                        </div>
+                        <!-- PERBAIKAN ABIL: Teks penjelasan upload -->
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem; line-height: 1.4;"><em>Berfungsi sebagai dokumentasi (struk fisik / SS bukti bayar / foto barang). Bisa dicek kembali pada tombol <strong>Detail</strong>.</em></p>
+                    </div>
+                </div>
+
+                <!-- Input Keterangan (Opsional) -->
+                <div class="form-group" style="margin-top: 0.5rem;">
+                    <label for="expenseNote">Keterangan Tambahan <span style="color:var(--text-muted); font-weight:normal;">(Opsional)</span></label>
+                    <textarea id="expenseNote" class="glass-input" rows="2" placeholder="Catatan tambahan, misalnya: Beli di warung Bu Tin..."></textarea>
+                </div>
+
+                <!-- Split Bill Checkbox -->
+                <div class="form-group split-bill-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="isSplitBill"> 
+                        <!-- PERBAIKAN KAYSAN: Nama diperjelas menjadi patungan -->
+                        <span class="custom-checkbox"></span> Bagi Tagihan (Patungan Sama Teman)?
+                    </label>
+                    <!-- PERBAIKAN KAYSAN: Tambahan teks deskripsi patungan -->
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; margin-left: 1.7rem; line-height: 1.3;">Centang opsi ini jika biaya pengeluaran dibayar bareng-bareng.</p>
+                    
+                    <div id="splitInputArea" class="hidden" style="margin-top:0.8rem;">
+                        <input type="number" id="splitCount" class="glass-input" placeholder="Total patungan berapa orang? (Misal: 3)" min="2">
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-glow">Rekam Pengeluaran</button>
+                <button type="button" id="cancelEditBtn" class="btn-cancel hidden">Batal Edit</button>
+
+                <!-- KETERANGAN BONUS PINTASAN KEYBOARD -->
+                <p class="hint"><i class="fa-solid fa-bolt" style="color:var(--warning)"></i> <em>Pintasan: Tekan tombol <strong>Enter</strong> pada keyboard saat mengisi form untuk menyimpan transaksi tanpa perlu mengeklik mouse.</em></p>
+            </form>
+        </section>
+
+        <!-- Area Riwayat -->
+        <section class="result-section glass-panel">
+            <div class="section-header">
+                <h3>Riwayat Transaksi</h3>
+                <span id="transactionCount" class="badge-count">0 Item</span>
+            </div>
+            
+            <div id="emptyState" class="state-container">
+                <div class="illustration" style="color: var(--text-muted);"><i class="fa-regular fa-folder-open"></i></div>
+                <h4>Belum ada jejak pengeluaran</h4>
+                <p>Dompetmu masih utuh, pertahankan!</p>
+            </div>
+
+            <div id="loadingState" class="state-container hidden">
+                <div class="spinner"></div>
+                <p>Mencatat ke kas anak kos...</p>
+            </div>
+
+            <div id="resultState" class="hidden">
+                <ul id="expenseList" class="expense-list"></ul>
+            </div>
+        </section>
+    </main>
+
+    <!-- TAMPILAN LAPORAN -->
+    <main class="main-wrapper view-section" id="reportView">
+        <header class="app-header glass-panel text-center">
+            <h1>Laporan & Evaluasi</h1>
+            <p>Rincian analisis pengeluaran & evaluasi hemat.</p>
+        </header>
+
+        <section class="glass-panel summary-chart-card text-center">
+            <p class="balance-label">TOTAL PENGELUARAN BULAN INI</p>
+            <h2 id="reportTotalExpense" class="text-danger responsive-amount">Rp 0</h2>
+        </section>
+
+        <section class="glass-panel chart-section">
+            <h3>Distribusi Pos Kategori</h3>
+            <div id="chartEmptyState" class="state-container">
+                <div class="illustration" style="color: var(--text-muted);"><i class="fa-solid fa-chart-pie"></i></div>
+                <h4>Belum ada data analisis</h4>
+                <p>Tambahkan pengeluaran di Beranda untuk melihat diagram.</p>
+            </div>
+
+            <div id="chartContainer" class="hidden">
+                <div class="custom-bar-chart" id="barChartArea"></div>
+            </div>
+        </section>
+
+        <section class="glass-panel chart-section" id="typeChartSection">
+            <h3>Kebutuhan vs Keinginan</h3>
+            <div id="typeChartArea" class="custom-bar-chart"></div>
+        </section>
+
+        <section class="glass-panel eval-section" id="evalSection">
+            <h3><i class="fa-solid fa-lightbulb" style="color: var(--warning);"></i> Evaluasi Singkat</h3>
+            <div id="evalBox" class="eval-box">
+                <p id="evalText">Belum ada transaksi untuk dievaluasi.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- TAMPILAN PROFIL -->
+    <main class="main-wrapper view-section" id="profileView">
+        <header class="app-header glass-panel text-center">
+            <h1>Profil Pengguna</h1>
+            <p>Pengaturan & Info Anak Kos</p>
+        </header>
+
+        <section class="glass-panel text-center" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            
+            <div class="profile-avatar-container">
+                <div class="animated-border-profile">
+                    <img id="profileImg" src="foto-habib.jpg" alt="Foto Profil" 
+                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Anak+Kos&background=4f46e5&color=fff&size=150';">
+                </div>
+                <label for="profileUpload" id="editPhotoBtn" class="hidden" style="position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; padding: 8px 9px; border-radius: 50%; cursor: pointer; border: 2px solid white; z-index: 10;">
+                    <i class="fa-solid fa-camera"></i>
+                </label>
+                <input type="file" id="profileUpload" accept="image/*" style="display: none;">
+            </div>
+            
+            <div id="profileDisplay">
+                <h2 id="profileNameDisplay">Muhammad Habib Al Rifa'i</h2>
+                <p class="balance-label" id="profileNrpDisplay">NRP: 5125500037</p>
+            </div>
+
+            <div id="profileEditForm" class="hidden" style="width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.5rem;">
+                <input type="text" id="profileNameInput" class="glass-input" placeholder="Nama Lengkap">
+                <input type="text" id="profileNrpInput" class="glass-input" placeholder="NRP/Angka Identitas">
+            </div>
+
+            <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 85%;">Mahasiswa rantau yang sedang berusaha bertahan hidup dari gempuran tanggal tua dan tugas kuliah.</p>
+            
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; justify-content: center;">
+                <button id="cancelEditProfileBtn" class="btn-sm hidden" style="padding: 0.8rem 1.5rem; background: #e2e8f0; color: var(--text-main); border-radius: 12px; font-size: 0.9rem;">
+                    Batal
+                </button>
+                <button id="toggleEditProfileBtn" class="btn-sm" style="padding: 0.8rem 1.5rem; background: var(--primary); color: white; border-radius: 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-pen"></i> Edit Profil
+                </button>
+            </div>
+
+            <audio id="successSound" preload="auto">
+                <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3" type="audio/mpeg">
+                Browser Anda tidak mendukung elemen audio.
+            </audio>
+        </section>
+    </main>
+
+    <!-- Modal Detail Transaksi -->
+    <div id="detailModal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel light-modal">
+            <button class="btn-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+            <h3>Detail Transaksi</h3>
+            <div id="modalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="confirmModal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel light-modal text-center">
+            <div class="illustration" style="font-size:2.5rem; margin-bottom:0.5rem; color: var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 style="margin-bottom:0.5rem;">Hapus Transaksi?</h3>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Apakah kamu yakin ingin menghapus transaksi ini?</p>
+            <div style="display:flex; gap:0.8rem; justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-sm" style="padding:0.7rem 1.2rem; background:#e2e8f0; font-size:0.9rem;">Batal</button>
+                <button id="confirmDeleteBtn" class="btn-sm btn-delete" style="padding:0.7rem 1.2rem; font-size:0.9rem;">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Pop up -->
+    <div id="toast" class="toast glass-panel">
+        <span class="toast-icon" style="color: var(--safe);"><i class="fa-solid fa-circle-check"></i></span>
+        <div class="toast-text">
+            <strong>Sukses!</strong>
+            <p id="toastMessage">Transaksi dicatat.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
