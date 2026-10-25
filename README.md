@@ -10,3 +10,7 @@
 ## Dokumen Proyek
 - [Project Charter (Konsep & Fitur MVP)](docs/CHARTER.md)
 - [Roadmap Pengerjaan (P10 - P14)](docs/ROADMAP.md)
+
+## Atribusi & Referensi
+- **Pustaka UI:** Bootstrap 5.3.3 (Digunakan untuk komponen Modal, Toast, dan Button).
+- **Asisten AI (Gemini):** Digunakan sebagai *thought partner* untuk membantu mendiagnosis masalah integrasi Bootstrap pada Bagian A, merumuskan ide Project Charter (Persona & Kriteria Sukses), dan menyusun arsitektur pemisahan API UI ke dalam file `ui-pustaka.js`.

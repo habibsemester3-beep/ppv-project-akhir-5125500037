@@ -1,9 +1,7 @@
 let expenses = [];
-// PERBAIKAN KAYSAN: Anggaran awal diset ke 0 agar diketik secara sadar oleh user
 let monthlyBudget = 0; 
 let idToDelete = null;
 
-// Referensi DOM Home
 const budgetInput = document.getElementById('monthlyBudget');
 const remainingBalanceEl = document.getElementById('remainingBalance');
 const balanceProgressEl = document.getElementById('balanceProgress');
@@ -13,7 +11,6 @@ const daysLeftEl = document.getElementById('daysLeft');
 const frugalBox = document.getElementById('frugalBox');
 const txCountEl = document.getElementById('transactionCount');
 
-// Referensi Form & Edit
 const expenseForm = document.getElementById('expenseForm');
 const formTitle = document.getElementById('formTitle');
 const editingIdInput = document.getElementById('editingId');
@@ -28,13 +25,11 @@ const submitBtn = document.getElementById('submitBtn');
 const cancelEditBtn = document.getElementById('cancelEditBtn');
 const noteInput = document.getElementById('expenseNote');
 
-// Referensi State
 const emptyState = document.getElementById('emptyState');
 const loadingState = document.getElementById('loadingState');
 const resultState = document.getElementById('resultState');
 const expenseList = document.getElementById('expenseList');
 
-// Referensi Laporan & Tambahan Tugas 4
 const reportTotalExpenseEl = document.getElementById('reportTotalExpense');
 const barChartArea = document.getElementById('barChartArea');
 const typeChartArea = document.getElementById('typeChartArea');
@@ -43,7 +38,6 @@ const navBtns = document.querySelectorAll('.nav-btn');
 const views = document.querySelectorAll('.view-section');
 const successSound = document.getElementById('successSound');
 
-// Modal & Toast
 const detailModal = document.getElementById('detailModal');
 const closeModalBtn = document.getElementById('closeModal');
 const modalBody = document.getElementById('modalBody');
@@ -52,10 +46,10 @@ const confirmModal = document.getElementById('confirmModal');
 const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-const toast = document.getElementById('toast');
-const toastMessage = document.getElementById('toastMessage');
+// Fallback untuk toast bawaan jika ui-pustaka.js gagal dimuat
+const fallbackToast = document.getElementById('toast');
+const fallbackToastMessage = document.getElementById('toastMessage');
 
-// Formatter & Helper
 function formatRupiah(angka) {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
 }
@@ -73,23 +67,19 @@ function getCurrentTimestamp() {
     return new Date().toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
 }
 
-// Navigasi SPA Tab
 navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         navBtns.forEach(b => b.classList.remove('active'));
         views.forEach(v => v.classList.remove('active'));
-        
         btn.classList.add('active');
         const targetView = document.getElementById(btn.dataset.target);
         targetView.classList.add('active');
-        
         if (btn.dataset.target === 'reportView') {
             renderChart();
         }
     });
 });
 
-// File Upload & Split Bill Toggle
 fileInput.addEventListener('change', function() {
     if (this.files && this.files.length > 0) {
         let name = this.files[0].name;
@@ -97,7 +87,6 @@ fileInput.addEventListener('change', function() {
         fileLabelText.textContent = name;
         fileLabelText.style.color = 'var(--primary)';
     } else {
-        // PERBAIKAN ABIL: Penamaan reset foto
         fileLabelText.textContent = 'Pilih Foto / Screenshot...';
         fileLabelText.style.color = 'var(--text-muted)';
     }
@@ -112,7 +101,7 @@ isSplitBillCheck.addEventListener('change', function() {
     }
 });
 
-// Modal Detail Logic (Diperbarui dengan ui-pustaka.js)
+// INTEGRASI MODAL BOOTSTRAP
 function openModal(id) {
     const exp = expenses.find(e => e.id === id);
     if(!exp) return;
@@ -120,7 +109,7 @@ function openModal(id) {
     const noteHtml = exp.note ? `<div class="modal-detail-row"><span class="modal-detail-label">Keterangan</span><span class="modal-detail-value" style="font-weight:500; font-size:0.85rem; max-width:60%; text-align:right;">${exp.note}</span></div>` : '';
     const imgHtml = exp.receipt ? `<img src="${exp.receipt}" class="modal-img-preview" alt="Struk">` : '';
     
-    bukaModalDetailHTML(`
+    const isiHTML = `
         <div class="modal-detail-row"><span class="modal-detail-label">Transaksi</span><span class="modal-detail-value">${exp.name}</span></div>
         <div class="modal-detail-row"><span class="modal-detail-label">Nominal</span><span class="modal-detail-value text-danger">${formatRupiah(exp.amount)}</span></div>
         <div class="modal-detail-row"><span class="modal-detail-label">Waktu</span><span class="modal-detail-value">${exp.timestamp}</span></div>
@@ -128,10 +117,19 @@ function openModal(id) {
         <div class="modal-detail-row"><span class="modal-detail-label">Sifat</span><span class="modal-detail-value">${exp.type}</span></div>
         ${noteHtml}
         ${imgHtml}
-    `);
-}
+    `;
 
-// Modal Confirm Delete Logic
+    // Panggil API Bootstrap jika ada, jika tidak, panggil modal manual
+    if(typeof bukaModalDetailHTML === 'function') {
+        bukaModalDetailHTML(isiHTML);
+    } else {
+        modalBody.innerHTML = isiHTML;
+        if(detailModal) detailModal.classList.remove('hidden');
+    }
+}
+if(closeModalBtn) closeModalBtn.addEventListener('click', () => detailModal.classList.add('hidden'));
+if(detailModal) detailModal.addEventListener('click', (e) => { if(e.target === detailModal) detailModal.classList.add('hidden'); });
+
 function askDeleteConfirmation(id) {
     idToDelete = id;
     confirmModal.classList.remove('hidden');
@@ -149,14 +147,19 @@ confirmDeleteBtn.addEventListener('click', () => {
         updateDashboard();
         renderChart();
         
-        // Memanggil API Toast Bootstrap
-        tampilkanToast('Transaksi telah dihapus.');
+        // INTEGRASI TOAST BOOTSTRAP
+        if(typeof tampilkanToast === 'function') {
+            tampilkanToast('Transaksi telah dihapus.');
+        } else if (fallbackToast) {
+            fallbackToastMessage.textContent = 'Transaksi telah dihapus.';
+            fallbackToast.classList.add('show');
+            setTimeout(() => fallbackToast.classList.remove('show'), 2500);
+        }
     }
     idToDelete = null;
     confirmModal.classList.add('hidden');
 });
 
-// Validasi
 function toggleError(element, message, isValid) {
     const errorEl = document.getElementById(`error-${element.id}`);
     const targetEl = element.id === 'expenseAmount' ? element.parentElement : element;
@@ -191,7 +194,6 @@ function validateInputs() {
     return isValid;
 }
 
-// Events
 amountInput.addEventListener('input', function(e) { formatInputVisual(e); if (getRawNumber(this.value) > 0) toggleError(amountInput, '', true); });
 budgetInput.addEventListener('input', function(e) { formatInputVisual(e); monthlyBudget = getRawNumber(this.value); updateDashboard(); });
 nameInput.addEventListener('input', () => { if(nameInput.value.trim() !== '') toggleError(nameInput, '', true); });
@@ -199,8 +201,10 @@ nameInput.addEventListener('input', () => { if(nameInput.value.trim() !== '') to
 document.addEventListener('mousemove', (e) => {
     const x = e.clientX / window.innerWidth;
     const y = e.clientY / window.innerHeight;
-    document.getElementById('blob1').style.transform = `translate(${x * 25}px, ${y * 25}px)`;
-    document.getElementById('blob2').style.transform = `translate(-${x * 35}px, -${y * 35}px)`;
+    const b1 = document.getElementById('blob1');
+    const b2 = document.getElementById('blob2');
+    if(b1) b1.style.transform = `translate(${x * 25}px, ${y * 25}px)`;
+    if(b2) b2.style.transform = `translate(-${x * 35}px, -${y * 35}px)`;
 });
 
 expenseForm.addEventListener('submit', function(e) { e.preventDefault(); if (validateInputs()) processNewExpense(); });
@@ -211,7 +215,6 @@ expenseForm.addEventListener('keydown', function(e) {
     }
 });
 
-// Handling Klik Action Buttons
 expenseList.addEventListener('click', function(e) {
     const id = parseInt(e.target.getAttribute('data-id'));
     if (e.target.classList.contains('btn-delete')) {
@@ -233,13 +236,14 @@ function startEditMode(id) {
     amountInput.value = new Intl.NumberFormat('id-ID').format(exp.amount);
     noteInput.value = exp.note || ''; 
 
-    document.querySelector(`input[name="expenseCategory"][value="${exp.category}"]`).checked = true;
-    document.querySelector(`input[name="expenseType"][value="${exp.type}"]`).checked = true;
+    const catEl = document.querySelector(`input[name="expenseCategory"][value="${exp.category}"]`);
+    if(catEl) catEl.checked = true;
+    const typeEl = document.querySelector(`input[name="expenseType"][value="${exp.type}"]`);
+    if(typeEl) typeEl.checked = true;
 
     formTitle.textContent = 'Edit Transaksi';
     submitBtn.textContent = 'Simpan Perubahan';
     cancelEditBtn.classList.remove('hidden');
-
     expenseForm.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -251,15 +255,12 @@ function resetEditMode() {
     submitBtn.textContent = 'Rekam Pengeluaran';
     cancelEditBtn.classList.add('hidden');
     splitInputArea.classList.add('hidden');
-    
-    // PERBAIKAN ABIL: Penamaan reset foto
     fileLabelText.textContent = 'Pilih Foto / Screenshot...';
     fileLabelText.style.color = 'var(--text-muted)';
 }
 
 cancelEditBtn.addEventListener('click', resetEditMode);
 
-// State & Core Processing
 function processNewExpense() {
     const categorySelected = document.querySelector('input[name="expenseCategory"]:checked').value;
     const typeSelected = document.querySelector('input[name="expenseType"]:checked').value;
@@ -285,6 +286,10 @@ function processNewExpense() {
     submitBtn.disabled = true;
 
     setTimeout(() => {
+        // MATIKAN ANIMASI LOADING DULU (Agar tidak macet)
+        loadingState.classList.add('hidden');
+        submitBtn.disabled = false;
+
         if (editingId) {
             const index = expenses.findIndex(e => e.id == editingId);
             if (index !== -1) {
@@ -295,8 +300,15 @@ function processNewExpense() {
                 expenses[index].note = note; 
                 if (receiptUrl) expenses[index].receipt = receiptUrl;
             }
-            // Memanggil API Toast Bootstrap
-            tampilkanToast('Transaksi diperbarui!');
+            
+            // INTEGRASI TOAST BOOTSTRAP
+            if(typeof tampilkanToast === 'function') {
+                tampilkanToast('Transaksi diperbarui!');
+            } else if (fallbackToast) {
+                fallbackToastMessage.textContent = 'Transaksi diperbarui!';
+                fallbackToast.classList.add('show');
+                setTimeout(() => fallbackToast.classList.remove('show'), 3000);
+            }
             resetEditMode();
         } else {
             const newExpense = {
@@ -310,20 +322,22 @@ function processNewExpense() {
                 timestamp: getCurrentTimestamp()
             };
             expenses.unshift(newExpense);
-            // Memanggil API Toast Bootstrap
-            tampilkanToast('Transaksi dicatat.');
+            
+            // INTEGRASI TOAST BOOTSTRAP
+            if(typeof tampilkanToast === 'function') {
+                tampilkanToast('Transaksi berhasil dicatat!');
+            } else if (fallbackToast) {
+                fallbackToastMessage.textContent = 'Transaksi berhasil dicatat!';
+                fallbackToast.classList.add('show');
+                setTimeout(() => fallbackToast.classList.remove('show'), 3000);
+            }
             expenseForm.reset();
             noteInput.value = '';
         }
 
         splitInputArea.classList.add('hidden');
-        
-        // PERBAIKAN ABIL: Penamaan reset foto
         fileLabelText.textContent = 'Pilih Foto / Screenshot...';
         fileLabelText.style.color = 'var(--text-muted)';
-        
-        submitBtn.disabled = false;
-        loadingState.classList.add('hidden');
         
         if (successSound) {
             successSound.currentTime = 0;
@@ -499,12 +513,8 @@ function renderChart() {
     }
 }
 
-// Inisialisasi awal
 updateDashboard();
 
-// ==========================================
-// LOGIKA EDIT PROFIL 
-// ==========================================
 const toggleEditProfileBtn = document.getElementById('toggleEditProfileBtn');
 const cancelEditProfileBtn = document.getElementById('cancelEditProfileBtn');
 const profileDisplay = document.getElementById('profileDisplay');
@@ -535,7 +545,6 @@ function exitProfileEditMode() {
 toggleEditProfileBtn.addEventListener('click', () => {
     if (!isEditingProfile) {
         isEditingProfile = true;
-        
         profileNameInput.value = profileNameDisplay.textContent;
         profileNrpInput.value = profileNrpDisplay.textContent.replace('NRP: ', '');
 
