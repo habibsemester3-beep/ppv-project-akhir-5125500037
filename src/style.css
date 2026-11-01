@@ -93,6 +93,24 @@ body {
 
 .daily-allowance-box { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 0.8rem 1rem; margin: 1rem 0; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 700; flex-wrap: wrap; gap: 0.4rem; }
 
+.daily-allowance-box { 
+    background: rgba(16, 185, 129, 0.1); 
+    border: 1px solid rgba(16, 185, 129, 0.3); 
+    border-radius: 12px; 
+    padding: 0.8rem 1rem; 
+    margin: 1rem 0; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    font-size: 0.85rem; 
+    font-weight: 700; 
+    flex-wrap: wrap; 
+    gap: 0.4rem; 
+    /* TAMBAHKAN DUA BARIS INI UNTUK BUG P1 */
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
 .progress-bar-container { height: 12px; background: rgba(0,0,0,0.05); border-radius: 20px; margin: 1.2rem 0 1rem; overflow: hidden; }
 .progress-bar { height: 100%; border-radius: 20px; transition: width 0.8s ease, background-color 0.4s ease; }
 .progress-bar.safe { background: var(--safe); }
@@ -242,7 +260,6 @@ textarea.glass-input { resize: vertical; min-height: 80px; }
     .expense-item { flex-direction: column; align-items: flex-start; }
     .item-right { width: 100%; align-items: flex-between; flex-direction: row; justify-content: space-between; border-top: 1px dashed rgba(0,0,0,0.08); padding-top: 0.6rem; margin-top: 0.2rem; }
 }
-
 /* ========================================== */
 /* TAMBAHAN TUGAS 4: Animasi Border Profil    */
 /* ========================================== */
@@ -250,6 +267,7 @@ textarea.glass-input { resize: vertical; min-height: 80px; }
     position: relative;
     display: inline-block;
 }
+
 .animated-border-profile {
     position: relative;
     width: 128px;
@@ -258,34 +276,43 @@ textarea.glass-input { resize: vertical; min-height: 80px; }
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; 
     box-shadow: var(--glass-shadow);
-    overflow: hidden; /* Tambahan agar ::before tidak keluar kotak */
 }
-/* Lapisan gradient yang berputar dipindah ke ::before */
+
 .animated-border-profile::before {
     content: '';
     position: absolute;
-    width: 150%;
-    height: 150%;
+    width: 200%; 
+    height: 200%;
     background: conic-gradient(from 0deg, var(--primary), #ec4899, var(--warning), var(--safe), var(--primary));
     animation: spinBorder 4s linear infinite;
+    z-index: 1; 
 }
-/* Lapisan putih di dalam border agar gambar terlihat rapi */
+
+/* Kunci Perbaikan P2: Wadah pembungkus gambar yang bulat */
 .animated-border-profile::after {
     content: '';
     position: absolute;
-    inset: 4px; 
-    background: var(--glass-bg);
-    border-radius: 50%;
-}
-.animated-border-profile img {
-    position: relative;
-    z-index: 2; /* Memastikan foto ada di atas animasi */
     width: 114px;
     height: 114px;
+    background: transparent;
     border-radius: 50%;
-    object-fit: cover;
+    border: 4px solid #f1f5f9;
+    z-index: 3; /* Bingkai putih di atas gambar */
+    pointer-events: none;
 }
+
+.animated-border-profile img {
+    position: absolute;
+    z-index: 2;
+    width: 114px;
+    height: 114px;
+    border-radius: 50% !important; 
+    object-fit: cover !important; /* WAJIB ADA: Ini yang memotong gambar persegi panjang jadi kotak/bulat */
+    object-position: top; /* Fokus ke area wajah (atas) gambar potret Anda */
+}
+
 @keyframes spinBorder {
     100% { transform: rotate(360deg); }
 }

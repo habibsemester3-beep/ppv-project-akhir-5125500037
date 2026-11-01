@@ -1,16 +1,18 @@
-# Dompet Anak Kos
+# LOG DEBUGGING - PROJECT AKHIR SPRINT 2
 
-**Masalah yang diselesaikan:** Kesulitan mahasiswa rantau dalam melacak pengeluaran harian, mengontrol batas aman pengeluaran agar bisa bertahan hidup sampai akhir bulan, dan menghitung patungan (*split bill*) dengan teman secara cepat.
+## BUG P1: Teks Nominal Raksasa Tumpah (Overflow)
+*   **Gejala (Reproduksi):** Jika diisi dengan nominal angka mencapai triliunan (digit sangat panjang), teks angka akan menabrak batas kotak container dan meleber ke kanan layar.
+*   **Hipotesis:** Container teks tidak memiliki aturan CSS pemutusan kata, sehingga deretan angka (tanpa spasi) dianggap sebagai satu string tidak terputus.
+*   **Bukti Alat (DevTools):** Lewat tab *Elements*, teks angka yang melampaui batas *width* pembungkusnya tidak dipaksa turun baris.
+*   **Penyebab & Perbaikan (style.css):** Tidak adanya pembatasan overflow teks. Diperbaiki dengan menambahkan properti `word-break: break-all;` dan `overflow-wrap: break-word;` pada *class* tipografi teks saldo/nominal.
+*   **Uji Ulang:** Saat diisi angka triliunan, angka otomatis turun ke baris baru dan tetap rapi di dalam kotak.
 
-## Cara Menjalankan Aplikasi
-1. Clone repositori ini ke perangkat Anda.
-2. Buka berkas `index.html` di peramban web modern (Chrome/Edge/Safari).
-3. Tidak diperlukan instalasi *server* lokal atau *database*, aplikasi dapat berjalan langsung secara statis.
+## BUG P2: Foto Profil Tidak Melingkar Sempurna
+*   **Gejala (Reproduksi):** Pada halaman Profil, foto pengguna tampil dengan sudut kotak atau terpotong tidak rata, tidak mengikuti bingkai lingkaran animasi dengan halus.
+*   **Hipotesis:** Aset gambar sumber memiliki rasio aspek persegi panjang (bukan 1:1) dan mengalami distorsi ukuran/kompresi piksel yang merusak batas border-radius pada elemen penampil.
+*   **Bukti Alat (DevTools):** Melalui panel *Elements*, tag `<img>` sudah memiliki styling pembulatan, tetapi file gambar aslinya memaksa area render melebar dan merusak kontainer *overflow: hidden*.
+*   **Penyebab & Perbaikan:** Ketidaksesuaian dimensi file aset gambar fisik. Diperbaiki dengan mengganti ulang aset gambar profil dengan ukuran kompresi yang proporsional (format kuadrat/persegi) serta memastikan properti `object-fit: cover` diterapkan dengan benar pada CSS.
+*   **Uji Ulang:** Foto profil kini terpotong dan melingkar mulus di dalam bingkai animasi tanpa ada bagian gambar yang keluar jalur.
 
-## Dokumen Proyek
-- [Project Charter (Konsep & Fitur MVP)](docs/CHARTER.md)
-- [Roadmap Pengerjaan (P10 - P14)](docs/ROADMAP.md)
-
-## Atribusi & Referensi
-- **Pustaka UI:** Bootstrap 5.3.3 (Digunakan untuk komponen Modal, Toast, dan Button).
-- **Asisten AI (Gemini):** Digunakan sebagai *thought partner* untuk membantu mendiagnosis masalah integrasi Bootstrap pada Bagian A, merumuskan ide Project Charter (Persona & Kriteria Sukses), dan menyusun arsitektur pemisahan API UI ke dalam file `ui-pustaka.js`.
+## Catatan Integritas Pengerjaan
+*   Bantuan Asisten AI digunakan untuk proses analisis galeri DevTools, perbaikan logika *overflow* teks nominal, serta penyesuaian styling pemotongan foto profil (*object-fit* dan *border-radius*) pada Project Akhir Sprint 2.
