@@ -1,18 +1,37 @@
-# LOG DEBUGGING - PROJECT AKHIR SPRINT 2
+# Dompet Anak Kos 💸
 
-## BUG P1: Teks Nominal Raksasa Tumpah (Overflow)
-*   **Gejala (Reproduksi):** Jika diisi dengan nominal angka mencapai triliunan (digit sangat panjang), teks angka akan menabrak batas kotak container dan meleber ke kanan layar.
-*   **Hipotesis:** Container teks tidak memiliki aturan CSS pemutusan kata, sehingga deretan angka (tanpa spasi) dianggap sebagai satu string tidak terputus.
-*   **Bukti Alat (DevTools):** Lewat tab *Elements*, teks angka yang melampaui batas *width* pembungkusnya tidak dipaksa turun baris.
-*   **Penyebab & Perbaikan (style.css):** Tidak adanya pembatasan overflow teks. Diperbaiki dengan menambahkan properti `word-break: break-all;` dan `overflow-wrap: break-word;` pada *class* tipografi teks saldo/nominal.
-*   **Uji Ulang:** Saat diisi angka triliunan, angka otomatis turun ke baris baru dan tetap rapi di dalam kotak.
+Aplikasi pelacak keuangan minimalis dan tangguh untuk mahasiswa rantau, dirancang untuk mencegah krisis "tanggal tua". 
 
-## BUG P2: Foto Profil Tidak Melingkar Sempurna
-*   **Gejala (Reproduksi):** Pada halaman Profil, foto pengguna tampil dengan sudut kotak atau terpotong tidak rata, tidak mengikuti bingkai lingkaran animasi dengan halus.
-*   **Hipotesis:** Aset gambar sumber memiliki rasio aspek persegi panjang (bukan 1:1) dan mengalami distorsi ukuran/kompresi piksel yang merusak batas border-radius pada elemen penampil.
-*   **Bukti Alat (DevTools):** Melalui panel *Elements*, tag `<img>` sudah memiliki styling pembulatan, tetapi file gambar aslinya memaksa area render melebar dan merusak kontainer *overflow: hidden*.
-*   **Penyebab & Perbaikan:** Ketidaksesuaian dimensi file aset gambar fisik. Diperbaiki dengan mengganti ulang aset gambar profil dengan ukuran kompresi yang proporsional (format kuadrat/persegi) serta memastikan properti `object-fit: cover` diterapkan dengan benar pada CSS.
-*   **Uji Ulang:** Foto profil kini terpotong dan melingkar mulus di dalam bingkai animasi tanpa ada bagian gambar yang keluar jalur.
+## 1. Cara Menjalankan
+1. Pastikan Anda memiliki peramban modern (Google Chrome, Firefox, atau Edge).
+2. Kloning repositori ini ke komputer lokal Anda.
+3. Gunakan ekstensi **Live Server** di VS Code atau jalankan `python -m http.server` dari terminal.
+4. Buka URL lokal yang muncul (misalnya: `http://127.0.0.1:5500/index.html`) di peramban.
 
-## Catatan Integritas Pengerjaan
-*   Bantuan Asisten AI digunakan untuk proses analisis galeri DevTools, perbaikan logika *overflow* teks nominal, serta penyesuaian styling pemotongan foto profil (*object-fit* dan *border-radius*) pada Project Akhir Sprint 2.
+## 2. Fitur MVP dan Status
+- [x] Menetapkan pagu anggaran (budget) bulanan.
+- [x] Menambah, mengedit, dan menghapus catatan transaksi pengeluaran.
+- [x] Kalkulasi dinamis untuk sisa saldo bulanan.
+- [x] Analisis batas aman harian (status: aman, waspada, kritis).
+- [x] Penyimpanan lokal (Local Storage) yang kebal terhadap korupsi data.
+- [x] Tampilan berbasis komponen UI *reusable*.
+
+## 3. Struktur Modul Aplikasi
+Aplikasi telah menggunakan arsitektur ES Modules (ESM) dengan pemisahan sebagai berikut:
+- `src/main.js`: *Entry point* aplikasi dan pendaftaran *event listeners*.
+- `src/state.js`: Logika bisnis, pemrosesan data, pengelola *state*, dan persistensi `localStorage`.
+- `src/ui.js`: Pengelola perenderan DOM, dasbor, indikator, dan pembaruan grafik UI.
+- `src/ui-pustaka.js`: Modul pembungkus (*wrapper*) untuk memanggil komponen pihak ketiga (Bootstrap Modal & Toast).
+- `src/komponen.js`: Pabrik komponen antarmuka yang independen (seperti `KartuPengeluaran`).
+
+## 4. Kontrak Komponen dan Penyimpanan
+- **Komponen (`KartuPengeluaran(exp, formatRupiah)`):** 
+  Fungsi ini menerima dua parameter: objek data pengeluaran (`{ id, name, amount, type, category, timestamp }`) dan fungsi *formatter* Rupiah. Fungsi mengembalikan sebuah elemen HTML murni (`HTMLElement`). Teks dari pengguna (seperti judul transaksi) dirender menggunakan `textContent` alih-alih `innerHTML` untuk mengeliminasi celah kerentanan *Cross-Site Scripting (XSS)*.
+- **Penyimpanan (`src/state.js`):** 
+  Menggunakan kunci penyimpanan berversi `dompet-anak-kos:v1`. Semua akses penyimpanan (baik fungsi `inisialisasiData()` untuk memuat maupun `simpanState()` untuk menulis) dibungkus menggunakan blok `try/catch`. Jika memori lokal diblokir atau diisi data JSON yang rusak/korup, fungsi inisialisasi hanya memuat *fallback* berupa memori data internal kosong, memastikan aplikasi tetap berjalan (tahan banting).
+
+## 5. Kredit Aset, Pustaka, & Bantuan AI
+- **Ikonografi:** FontAwesome (Gratis).
+- **Interaksi Antarmuka:** Bootstrap v5.3 (CSS & JS) digunakan untuk fitur Modal dan sistem Toast.
+- **Inspirasi Visual:** Palet warna *flat* dan kartu berbayang (Material Design).
+- **Catatan Integritas:** Pengembangan struktur kode modular, implementasi `try/catch` penyimpan aman, serta pemenuhan skenario "anti-banting" (*fallback data*) di Sprint 4 ini dipandu dengan bantuan asisten AI Gemini (Google).

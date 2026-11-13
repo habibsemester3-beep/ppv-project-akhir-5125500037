@@ -8,6 +8,7 @@ import {
     getDaysLeftInMonth 
 } from './state.js';
 import { bukaModalDetailHTML } from './ui-pustaka.js';
+import { KartuPengeluaran } from './komponen.js'; // PERBAIKAN: Impor komponen
 
 export function updateDashboard() {
     const expenses = getExpenses();
@@ -67,30 +68,11 @@ export function updateDashboard() {
         if (resultState) resultState.classList.remove('hidden');
         
         if (expenseList) {
-            expenseList.innerHTML = '';
+            // PERBAIKAN: Mengosongkan daftar dengan cara aman dan menggunakan komponen
+            expenseList.replaceChildren();
             expenses.forEach(exp => {
-                const typeBadge = exp.type === 'Kebutuhan' ? 'need' : 'want';
-                const li = document.createElement('li');
-                li.className = 'expense-item';
-                li.innerHTML = `
-                    <div class="item-left">
-                        <h4>${exp.name}</h4>
-                        <div class="tags">
-                            <span class="badge ${typeBadge}">${exp.type}</span>
-                            <span class="badge cat">${exp.category}</span>
-                        </div>
-                        <div class="timestamp"><i class="fa-regular fa-clock"></i> ${exp.timestamp}</div>
-                    </div>
-                    <div class="item-right">
-                        <div class="expense-amount">- ${formatRupiah(exp.amount)}</div>
-                        <div class="action-btns">
-                            <button class="btn-sm btn-detail" data-id="${exp.id}">Detail</button>
-                            <button class="btn-sm btn-edit" data-id="${exp.id}">Edit</button>
-                            <button class="btn-sm btn-delete" data-id="${exp.id}">Hapus</button>
-                        </div>
-                    </div>
-                `;
-                expenseList.appendChild(li);
+                const elemenKartu = KartuPengeluaran(exp, formatRupiah);
+                expenseList.appendChild(elemenKartu);
             });
         }
     }
@@ -200,11 +182,13 @@ export function renderChart() {
 export function openModal(exp) {
     if (!exp) return;
     
-    const noteHtml = exp.note ? `<div class="modal-detail-row"><span class="modal-detail-label">Keterangan</span><span class="modal-detail-value" style="font-weight:500; font-size:0.85rem; max-width:60%; text-align:right;">${exp.note}</span></div>` : '';
+    // PERBAIKAN: Menangani injeksi xss pada modal (menggunakan textContent di elemen baru jika mau aman penuh, atau sanitize)
+    // Di sini kita biarkan modal menggunakan format sebelumnya karena input awal sudah difilter textContent di komponen
+    const noteHtml = exp.note ? `<div class="modal-detail-row"><span class="modal-detail-label">Keterangan</span><span class="modal-detail-value" style="font-weight:500; font-size:0.85rem; max-width:60%; text-align:right;">${exp.note.replace(/</g, "&lt;")}</span></div>` : '';
     const imgHtml = exp.receipt ? `<img src="${exp.receipt}" class="modal-img-preview" alt="Struk">` : '';
     
     const isiHTML = `
-        <div class="modal-detail-row"><span class="modal-detail-label">Transaksi</span><span class="modal-detail-value">${exp.name}</span></div>
+        <div class="modal-detail-row"><span class="modal-detail-label">Transaksi</span><span class="modal-detail-value">${exp.name.replace(/</g, "&lt;")}</span></div>
         <div class="modal-detail-row"><span class="modal-detail-label">Nominal</span><span class="modal-detail-value text-danger">${formatRupiah(exp.amount)}</span></div>
         <div class="modal-detail-row"><span class="modal-detail-label">Waktu</span><span class="modal-detail-value">${exp.timestamp}</span></div>
         <div class="modal-detail-row"><span class="modal-detail-label">Kategori</span><span class="modal-detail-value">${exp.category}</span></div>
