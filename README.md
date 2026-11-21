@@ -35,3 +35,5 @@ Aplikasi telah menggunakan arsitektur ES Modules (ESM) dengan pemisahan sebagai 
 - **Interaksi Antarmuka:** Bootstrap v5.3 (CSS & JS) digunakan untuk fitur Modal dan sistem Toast.
 - **Inspirasi Visual:** Palet warna *flat* dan kartu berbayang (Material Design).
 - **Catatan Integritas:** Pengembangan struktur kode modular, implementasi `try/catch` penyimpan aman, serta pemenuhan skenario "anti-banting" (*fallback data*) di Sprint 4 ini dipandu dengan bantuan asisten AI Gemini (Google).
+
+- **Templat Halaman Konsep (`docs/konsep/`):** Menggunakan templat `index.html` dan `tampil.js` dari Lampiran Tugas 7 Praktikum Pemrograman Visual PENS (2026) untuk validasi dokumen konsep produk.
